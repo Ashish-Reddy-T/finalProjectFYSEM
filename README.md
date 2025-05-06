@@ -121,7 +121,7 @@ This game is designed not just for entertainment, but as an educational tool to 
 
 * Game Design & Writing: FY-SEM Creative Project
 * Programming: Ashish Reddy Tummuri
-* Academic Adviser: Prof. Robert Huddleston
+* Academic Professor: Prof. Robert Huddleston
 * Literary Inspiration: Francisco Cantú, "The Line Becomes a River"
 
 ---
