@@ -61,7 +61,7 @@ def display_credits():
     
     Game Design & Writing: FY-SEM CREATIVE PROJECT
     Programming: Ashish Reddy Tummuri
-    Academic Adviser: Prof. Robert Huddleston
+    Academic Professor: Prof. Robert Huddleston
     
     Special Thanks:
     - Francisco Cantú for the powerful book that inspired this project
