@@ -23,6 +23,30 @@ For enhanced natural language processing, you can use:
 * Ollama with the `mxbai-embed-large` model running locally (usually at `http://localhost:11434`)
 * If Ollama isn't available, the game will gracefully fall back to standard text commands
 
+#### Installing Ollama CLI
+
+__macOS & Linux__
+```bash
+curl -fsSL https://ollama.com/install.sh | sh
+```
+
+__Windows__
+1. Download the Windows installer from the [Ollama download page](https://ollama.com/download).
+2. Run the downloaded `.exe` and follow the prompts.
+
+#### Pull the embedding model
+
+```bash
+ollama pull mxbai-embed-large # [OR]
+ollama pull nomic-embed-text # Suitable for a smaller and faster model
+```
+
+#### Start the Ollama API server
+
+```bash
+ollama serve # By default, Ollama listens on `http://localhost:11434`.
+```
+
 ### Running the Game:
 
 1. Clone or download this repository
