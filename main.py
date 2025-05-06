@@ -77,7 +77,7 @@ def display_credits():
     
     clear_screen()
     print_slow(credits, 0.01)
-    input("\nPress Enter to return to the main menu ...")
+    input("\nPress Enter to return to the main menu ... ")
 
 
 def save_game(game):
@@ -88,7 +88,7 @@ def save_game(game):
     """
     print("\nSaving game is not yet implemented in this version.")
     print("This feature would allow you to continue your journey later.")
-    input("\nPress Enter to continue...")
+    input("\nPress Enter to continue ... ")
 
 
 def intro_page():
@@ -185,7 +185,7 @@ def about_game():
     
     clear_screen()
     print_slow(about_text, 0.01)
-    input("\nPress Enter to return to the main menu ...")
+    input("\nPress Enter to return to the main menu ... ")
 
 
 def parse_arguments():
@@ -227,15 +227,15 @@ def main():
             try:
                 game.start()
             except KeyboardInterrupt:
-                print("\n\nGame interrupted. Returning to main menu...")
+                print("\n\nGame interrupted. Returning to main menu ... ")
                 time.sleep(2)
             except Exception as e:
                 if args.debug:
                     print(f"\nERROR: {e}")
-                    print("Returning to main menu...")
+                    print("Returning to main menu ... ")
                     time.sleep(3)
                 else:
-                    print("\nAn error occurred. Returning to main menu...")
+                    print("\nAn error occurred. Returning to main menu ... ")
                     time.sleep(2)
                     
         elif choice == "2":  # About This Game
