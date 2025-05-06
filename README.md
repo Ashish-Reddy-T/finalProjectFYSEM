@@ -52,9 +52,10 @@ ollama serve # By default, Ollama listens on `http://localhost:11434`.
 1. Clone or download this repository
 2. Navigate to the game directory in your terminal
 3. Run the main script:
-    ```bash
-    python main.py
-    ```
+   
+   ```bash
+   python main.py
+   ```
 
 ### Command Line Options:
 ```
