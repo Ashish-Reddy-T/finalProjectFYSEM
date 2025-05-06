@@ -80,7 +80,7 @@ Experience the border from two distinct viewpoints:
 
 ### Immersive Storytelling:
 * Rich environmental descriptions based on actual border locations
-* Dialogue inspired by real experiences documented in Cantú's work
+* Dialogue inspired by Cantú's work
 * Weather and time-of-day systems that affect gameplay
 * Trauma and psychological aspects of border experiences
 
