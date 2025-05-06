@@ -77,7 +77,7 @@ def display_credits():
     
     clear_screen()
     print_slow(credits, 0.01)
-    input("\nPress Enter to return to the main menu...")
+    input("\nPress Enter to return to the main menu ...")
 
 
 def save_game(game):
@@ -185,7 +185,7 @@ def about_game():
     
     clear_screen()
     print_slow(about_text, 0.01)
-    input("\nPress Enter to return to the main menu...")
+    input("\nPress Enter to return to the main menu ...")
 
 
 def parse_arguments():
