@@ -162,6 +162,10 @@ class EncounterEvent(Event):
                     
             chosen_option = choice_options[choice_index]
             consequence = self.choices[chosen_option]
+
+            # Update stats - ADD THESE LINES
+            game.story.update_journey_stats("moral_choices_made")
+            game.story.update_journey_stats("lives_impacted")
             
             # Apply the consequence effects
             result = f"You chose: {chosen_option}\n{consequence['description']}"
@@ -482,9 +486,8 @@ class WeatherEvent(Event):
     """An event that changes the weather conditions."""
     
     def __init__(self, name, description, weather_type, effects, location_types=None, 
-                 required_flags=None, excluded_flags=None, duration=3):
-        """
-        Initialize a weather event.
+                 required_flags=None, excluded_flags=None, time_of_day=None, duration=3):
+        """Initialize a weather event.
         
         Args:
             name (str): Name of the event
@@ -494,9 +497,10 @@ class WeatherEvent(Event):
             location_types (list): Types of locations where this event can occur
             required_flags (dict): Flags that must be set for this event to occur
             excluded_flags (dict): Flags that prevent this event from occurring
+            time_of_day (list): Times of day when this event can occur
             duration (int): Number of turns the weather lasts
         """
-        super().__init__(name, description, location_types, required_flags, excluded_flags)
+        super().__init__(name, description, location_types, required_flags, excluded_flags, time_of_day)
         self.weather_type = weather_type
         self.effects = effects
         self.duration = duration

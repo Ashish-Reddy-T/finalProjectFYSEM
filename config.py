@@ -38,7 +38,7 @@ DIFFICULTY_MODIFIERS = {
 }
 
 # Text display settings
-TEXT_SPEED = 0.03  # Seconds per character in slow printing
+TEXT_SPEED = 0.001  # Seconds per character in slow printing
 ENABLE_TEXT_EFFECTS = True
 
 # Debug settings

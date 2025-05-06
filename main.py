@@ -22,7 +22,7 @@ def clear_screen():
     os.system('cls' if os.name == 'nt' else "clear")
 
 
-def print_slow(text, delay=0.03, end='\n'):
+def print_slow(text, delay=0.001, end='\n'):
     """Print text with a typing effect for immersion.
     
     Args:
@@ -49,7 +49,7 @@ def display_title():
     ║                                                            ║
     ╚════════════════════════════════════════════════════════════╝
     """
-    print_slow(title, 0.005)
+    print_slow(title, 0.001)
 
 
 def display_credits():
@@ -76,7 +76,7 @@ def display_credits():
     """
     
     clear_screen()
-    print_slow(credits, 0.02)
+    print_slow(credits, 0.01)
     input("\nPress Enter to return to the main menu...")
 
 
@@ -184,7 +184,7 @@ def about_game():
     """
     
     clear_screen()
-    print_slow(about_text, 0.02)
+    print_slow(about_text, 0.01)
     input("\nPress Enter to return to the main menu...")
 
 

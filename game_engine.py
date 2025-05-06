@@ -751,6 +751,9 @@ class GameEngine:
                 if character != self.player and target.lower() in character.name.lower():
                     # Increment turn counter
                     self.turn_count += 1
+
+                    # Track lives impacted
+                    self.story.update_journey_stats("lives_impacted")
                     
                     # Get character-specific dialogue from story
                     dialogue = self.story.get_character_dialogue(character, self.player)

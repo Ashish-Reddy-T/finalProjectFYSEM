@@ -346,7 +346,7 @@ class Story:
         """Clear the terminal screen for better presentation."""
         os.system('cls' if os.name == 'nt' else "clear")
     
-    def print_slow(self, text, delay=0.03):
+    def print_slow(self, text, delay=0.001):
         """Print text with a typing effect for dramatic presentation.
         
         Args:
@@ -566,9 +566,9 @@ class Story:
             player: The player character object
         """
         self.clear_screen()
-        print("╔════════════════════════════════════════════════════════════╗")
-        print("║                       EPILOGUE                             ║")
-        print("╚════════════════════════════════════════════════════════════╝\n")
+        print("\t\t╔════════════════════════════════════════════════════════════╗")
+        print("\t\t║                       EPILOGUE                             ║")
+        print("\t\t╚════════════════════════════════════════════════════════════╝\n")
         
         # Get player-specific context for the epilogue
         player_type = "migrant" if hasattr(player, 'origin') else "patrol"
@@ -1047,6 +1047,10 @@ class Story:
         
         # Update journey stats
         self.update_journey_stats("key_events", event["description"])
+
+        # Check if this event involves another character
+        if "encounter" in event["description"].lower() or "man" in event["description"].lower() or "person" in event["description"].lower():
+            self.update_journey_stats("lives_impacted")
         
         return event
     
