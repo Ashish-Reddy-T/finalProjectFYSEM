@@ -52,9 +52,10 @@ ollama serve # By default, Ollama listens on `http://localhost:11434`.
 1. Clone or download this repository
 2. Navigate to the game directory in your terminal
 3. Run the main script:
-    ```bash
-    python main.py
-    ```
+   
+   ```bash
+   python main.py
+   ```
 
 ### Command Line Options:
 ```
@@ -80,7 +81,7 @@ Experience the border from two distinct viewpoints:
 
 ### Immersive Storytelling:
 * Rich environmental descriptions based on actual border locations
-* Dialogue inspired by real experiences documented in Cantú's work
+* Dialogue inspired by Cantú's work
 * Weather and time-of-day systems that affect gameplay
 * Trauma and psychological aspects of border experiences
 
@@ -120,7 +121,7 @@ This game is designed not just for entertainment, but as an educational tool to 
 
 * Game Design & Writing: FY-SEM Creative Project
 * Programming: Ashish Reddy Tummuri
-* Academic Adviser: Prof. Robert Huddleston
+* Academic Professor: Prof. Robert Huddleston
 * Literary Inspiration: Francisco Cantú, "The Line Becomes a River"
 
 ---
