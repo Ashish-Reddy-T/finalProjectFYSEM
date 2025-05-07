@@ -15,7 +15,7 @@ This project is created as part of NYU's FY-SEM course taught by Prof. Huddlesto
 * Python 3.7+ installed
 * Required Python libraries:
     ```bash
-    pip install -r requirements.txt
+    pip3 install -r requirements.txt
     ```
 
 ### Optional AI Feature:
@@ -54,14 +54,14 @@ ollama serve # By default, Ollama listens on `http://localhost:11434`.
 3. Run the main script:
    
    ```bash
-   python main.py
+   python3 main.py
    ```
 
 ### Command Line Options:
 ```
-python main.py --help        # Show available options
-python main.py --debug       # Enable debug mode
-python main.py --skip-intro  # Skip introduction sequence
+python3 main.py --help        # Show available options
+python3 main.py --debug       # Enable debug mode
+python3 main.py --skip-intro  # Skip introduction sequence
 ```
 ---
 
