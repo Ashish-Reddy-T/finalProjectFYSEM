@@ -10,6 +10,12 @@ This project is created as part of NYU's FY-SEM course taught by Prof. Huddlesto
 
 ---
 
+## Demo
+
+Please access the DEMO video [here](https://youtu.be/g-L16W1q7Tc)!
+
+---
+
 ## Installation
 
 ### Requirements:
