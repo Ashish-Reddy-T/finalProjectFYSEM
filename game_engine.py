@@ -31,7 +31,8 @@ class GameEngine:
         self.events = []
         self.items = [
             "Water Bottle", "Canned Food", "Blanket", "Map", "Flashlight",
-            "First Aid Kit", "Compass", "Family Photo", "Money", "ID Papers", "Radio"
+            "First Aid Kit", "Compass", "Family Photo", "Money", "ID Papers", 
+            "Radio", "Wire Cutters"  # Added wire cutters for border crossing
         ]
         self.turn_count = 0
         self.game_over = False
@@ -60,6 +61,7 @@ class GameEngine:
         )
         nogales_mx.add_service("food")
         nogales_mx.add_service("shelter")
+        nogales_mx.add_item("Wire Cutters")
         
         sonoran_desert = Desert(
             "Sonoran Desert", 
@@ -183,7 +185,11 @@ class GameEngine:
             )
             self.player.add_to_inventory("Water Bottle")
             self.player.add_to_inventory("Family Photo")
-            self.player.add_to_inventory("Canned Food")  # Added starting food
+            self.player.add_to_inventory("Canned Food")
+            
+            # Migrant starts in Mexico
+            self.current_location = self.world["nogales_mx"]
+            
         elif character_type.lower() == "patrol":
             self.player = BorderPatrol(
                 name,
@@ -194,8 +200,14 @@ class GameEngine:
             self.player.add_to_inventory("Flashlight")
             self.player.add_to_inventory("Radio")
             self.player.add_to_inventory("Water Bottle")
-            self.player.add_to_inventory("Canned Food")  # Added starting food
-        
+            self.player.add_to_inventory("Canned Food")
+            
+            # Border Patrol starts in US - fixing the jurisdictional issue
+            self.current_location = self.world["nogales_us"]
+            
+            # Add appropriate flags for Border Patrol
+            self.player.set_flag("is_border_patrol", True)
+            
         # Place player at starting location
         if self.current_location:
             self.current_location.add_character(self.player)
@@ -204,6 +216,19 @@ class GameEngine:
         """Load events into the game."""
         self.events = create_common_events()
         
+        # Add special border crossing event
+        from events import BorderCrossingEvent
+        border_crossing = BorderCrossingEvent(
+            "Border Wall Crossing",
+            "The imposing steel wall stretches in both directions as far as you can see, topped with razor wire and monitored by cameras and sensors. Crossing this barrier will be your greatest challenge.",
+        )
+        
+        # Add border crossing event specifically to the border fence location
+        if "border_fence" in self.world:
+            self.world["border_fence"].add_event(border_crossing)
+            # Make this event occur with 100% probability when arriving at the border
+            self.world["border_fence"].auto_event = border_crossing
+            
         # Add events to appropriate locations
         for event in self.events:
             for location in self.world.values():
@@ -253,8 +278,8 @@ class GameEngine:
         # Initialize AI embeddings with game content
         self.initialize_embeddings()
         
-        # Display initial story
-        self.story.display_intro(self.current_location.name)
+        # Display initial story with character-specific context
+        self.story.display_intro(self.current_location.name, character_type)
         
         # Main game loop
         self.main_loop()
@@ -509,12 +534,23 @@ class GameEngine:
 
         if direction not in self.current_location.connections:
             return f"You cannot go {direction} from here."
+            
+        # Get the destination
+        destination = self.current_location.connections[direction]
+
+        # Special handling for Border Patrol trying to enter Mexico
+        from character import BorderPatrol
+        if (isinstance(self.player, BorderPatrol) and 
+            (destination.name == "Nogales (Mexico)" or destination.name == "Sonoran Desert")):
+            return ("As a Border Patrol agent, you cannot enter Mexican territory. Your jurisdiction " +
+                    "is limited to US soil, and crossing into Mexico would be both against protocol " +
+                    "and potentially dangerous.")
 
         # Remove player from current location
         self.current_location.remove_character(self.player)
 
         # Update current location
-        self.current_location = self.current_location.connections[direction]
+        self.current_location = destination
 
         # Add player to new location
         self.current_location.add_character(self.player)
@@ -530,21 +566,24 @@ class GameEngine:
         move_report = f"You travel {direction} to {self.current_location.name}.\n"
         move_report += self.current_location.describe(detailed=True)
 
-        # Check for location-based event upon arrival
-        event_result = self.check_for_event()
-        if event_result:
-            move_report += "\n\n" + event_result
-            event_desc = event_result.split('\n')[0] if '\n' in event_result else event_result
+        # Check for mandatory auto_event (like border crossing)
+        if (hasattr(self.current_location, 'auto_event') and 
+            self.current_location.auto_event):
             
-            if "moral" in event_result.lower() or "choice" in event_result.lower():
-                self.story.update_journey_stats("moral_choices_made")
+            from character import Migrant
+            # For migrants at the border, trigger the crossing event automatically
+            if (isinstance(self.player, Migrant) and
+                self.current_location.name == "Border Wall"):
                 
-            if "encounter" in event_result.lower():
-                self.story.update_journey_stats("lives_impacted")
-                # Add only unique encounters to stats
-                if not self.story.journey_stats["key_events"] or event_desc != self.story.journey_stats["key_events"][-1]:
-                    self.story.update_journey_stats("event", event_desc)
-
+                event_result = self.current_location.auto_event.execute(self, self.player)
+                if event_result:
+                    move_report += f"\n\n{event_result}"
+        else:
+            # Regular random events
+            event_result = self.check_for_event()
+            if event_result:
+                move_report += "\n\n" + event_result
+                
         return move_report
     
     def check_for_event(self, force=False):

@@ -27,6 +27,7 @@ class Location:
         self.connections = {} # Connected locations {direction: location}
         self.visited = False  # Whether player has visited this location
         self.events = []      # Possible events at this location
+        self.auto_event = None # Event that triggers automatically upon arrival
         self.environment = {} # Environmental factors (visibility, terrain, etc.)
         self.time_of_day = "day" # Current time of day
         

@@ -354,7 +354,206 @@ class ResourceEvent(Event):
                     return f"{base_result}\n{character.name} lost {item} despite attempts to protect it."
         
         return base_result
-
+    
+class BorderCrossingEvent(Event):
+    """An event specifically for crossing the border wall."""
+    
+    def __init__(self, name, description, location_types=None, 
+                 required_flags=None, excluded_flags=None, time_of_day=None):
+        """Initialize a border crossing event."""
+        # Make sure this only happens at Border locations
+        from location import Border
+        super().__init__(name, description, location_types=[Border], 
+                        required_flags=required_flags, excluded_flags=excluded_flags, 
+                        time_of_day=time_of_day)
+        
+        # Define different crossing methods with varying risks
+        self.crossing_methods = [
+            {
+                "name": "Climb over with makeshift ladder",
+                "description": "Use a homemade ladder to scale the wall in a less monitored section.",
+                "success_chance": 40,
+                "health_risk": 15,
+                "requires": None,
+                "outcome_success": "You carefully set up the ladder against the wall during a patrol gap. Climbing is harder than expected, especially while carrying your belongings. At the top, you must drop down 20 feet to the other side. The impact jars through your body, but you've made it across.",
+                "outcome_failure": "The ladder shifts unexpectedly as you climb. You fall hard onto Mexican soil, painfully injuring yourself. Border Patrol spotlights sweep nearby, forcing you to retreat quickly."
+            },
+            {
+                "name": "Pay a guide (coyote) for tunnel access",
+                "description": "Pay $50 to use a hidden tunnel that runs beneath the border wall.",
+                "success_chance": 70,
+                "health_risk": 10,
+                "requires": {"money": 50},
+                "outcome_success": "The guide leads you to an unmarked location half a mile from the wall. You squeeze into a narrow tunnel, crawling through darkness for what feels like hours. Emerging on the US side, you're disoriented but safely across.",
+                "outcome_failure": "The tunnel entrance seems suspicious, and indeed, you spot signs of recent patrol activity. Your guide abandons you when border patrol vehicles approach, keeping your payment while you're forced to retreat."
+            },
+            {
+                "name": "Find a gap in the fence",
+                "description": "Search for damaged sections where you might slip through.",
+                "success_chance": 30,
+                "health_risk": 5,
+                "requires": None,
+                "outcome_success": "After hours of careful scouting, you find a section where erosion has created a small gap beneath the wall. It's a tight squeeze that tears your clothing and scrapes your skin, but you wriggle through to the other side.",
+                "outcome_failure": "You find what appears to be a gap, but while attempting to squeeze through, you become temporarily stuck. By the time you extract yourself, you've been spotted by a patrol drone and must flee back into Mexican territory."
+            },
+            {
+                "name": "Wait for nightfall and use wire cutters",
+                "description": "Use wire cutters to create an opening in a less monitored section at night.",
+                "success_chance": 50,
+                "health_risk": 10,
+                "requires": {"item": "Wire Cutters"},
+                "outcome_success": "Under cover of darkness, you approach a section between camera posts. The sound of metal cutting through metal seems deafening in the night silence. You create just enough space to squeeze through, leaving behind a gap that will likely be discovered by morning patrols.",
+                "outcome_failure": "As you begin cutting, bright floodlights suddenly illuminate your position. The Border Patrol has night vision technology, and your attempt has been discovered. You run back toward Nogales to avoid capture."
+            },
+            {
+                "name": "Join a larger group crossing",
+                "description": "Safety in numbers - join 15-20 others attempting a coordinated crossing.",
+                "success_chance": 60,
+                "health_risk": 20,
+                "requires": {"money": 30},
+                "outcome_success": "You join a large group led by experienced guides. When you reach the wall, the group splits into smaller units. While Border Patrol intercepts some groups, yours slips through during the chaos. The sprint across open terrain is exhausting, but you make it to the pickup point.",
+                "outcome_failure": "The large group attracts immediate attention. Patrol vehicles, helicopters, and agents converge quickly. In the ensuing chaos, some make it across, but you're forced back into Mexico as agents close in."
+            }
+        ]
+    
+    def execute(self, game, character):
+        """Execute the border crossing event for the given character.
+        
+        Args:
+            game: The game instance
+            character: The character experiencing the event
+            
+        Returns:
+            str: Description of what happened
+        """
+        # Only relevant for migrants
+        from character import Migrant
+        if not isinstance(character, Migrant):
+            return "This event is only relevant for migrants."
+            
+        # Check if character meets flag requirements
+        if not self.check_flags(character):
+            return None
+            
+        # Present the crossing options
+        print(f"\n-----BORDER CROSSING CHALLENGE-----")
+        print(self.description)
+        print("\nYou must find a way past the heavily guarded border wall. Each method has risks and requirements.")
+        
+        # Show available options
+        valid_options = []
+        for i, method in enumerate(self.crossing_methods, 1):
+            # Check if player meets requirements
+            can_use = True
+            req_text = ""
+            
+            if method["requires"]:
+                if "money" in method["requires"] and hasattr(character, 'money'):
+                    if character.money < method["requires"]["money"]:
+                        can_use = False
+                        req_text = f" (Requires ${method['requires']['money']} - you only have ${character.money})"
+                    else:
+                        req_text = f" (Costs ${method['requires']['money']})"
+                        
+                if "item" in method["requires"] and method["requires"]["item"] not in character.inventory:
+                    can_use = False
+                    req_text = f" (Requires {method['requires']['item']} - not in your inventory)"
+            
+            if can_use:
+                valid_options.append(i-1)  # Store index of valid option
+                
+            # Format text differently based on availability
+            if can_use:
+                print(f"{i}. {method['name']}: {method['description']}{req_text}")
+            else:
+                print(f"{i}. {method['name']}: {method['description']}{req_text} [NOT AVAILABLE]")
+        
+        if not valid_options:
+            return "You don't have the resources needed for any crossing method. You'll need to gather more supplies or money."
+            
+        # Get player's choice
+        valid_choice = False
+        choice_index = 0
+        
+        while not valid_choice:
+            try:
+                choice_input = input(f"\nChoose your crossing method (1-{len(self.crossing_methods)}): ")
+                choice_index = int(choice_input) - 1
+                if 0 <= choice_index < len(self.crossing_methods):
+                    if choice_index in valid_options:
+                        valid_choice = True
+                    else:
+                        print("You don't meet the requirements for that method. Choose another.")
+                else:
+                    print(f"Please enter a number between 1 and {len(self.crossing_methods)}.")
+            except ValueError:
+                print("Please enter a valid number.")
+                
+        chosen_method = self.crossing_methods[choice_index]
+        
+        # Apply resource costs
+        if chosen_method["requires"] and "money" in chosen_method["requires"]:
+            character.money -= chosen_method["requires"]["money"]
+        
+        # Determine success based on chance
+        success_roll = random.randint(1, 100)
+        success = success_roll <= chosen_method["success_chance"]
+        
+        # Apply health impact
+        health_impact = chosen_method["health_risk"]
+        if not success:
+            health_impact = int(health_impact * 1.5)  # Higher impact on failure
+            
+        old_health = character.health
+        character.health = max(0, character.health - health_impact)
+        health_change = character.health - old_health
+        
+        # Build result narrative
+        result = f"You attempt to cross using the '{chosen_method['name']}' method.\n\n"
+        
+        # Handle success or failure
+        if success:
+            result += chosen_method["outcome_success"]
+            result += f"\n\nThe crossing takes a physical toll ({health_change} health)."
+            
+            # Move character to US side if currently at border
+            if game.current_location.name == "Border Wall":
+                # Remove from current location
+                game.current_location.remove_character(character)
+                # Move to US side
+                game.current_location = game.world["nogales_us"]
+                game.current_location.add_character(character)
+                game.current_location.visited = True
+                
+                # Update journey stats
+                game.story.update_journey_stats("key_events", f"Successfully crossed border using {chosen_method['name']}")
+                
+                # Add some hope for successful crossing
+                if hasattr(character, 'hope'):
+                    character.hope = min(100, character.hope + 15)
+                    result += " Despite the difficulties, your spirits rise as you set foot on US soil."
+            
+        else:
+            result += chosen_method["outcome_failure"]
+            result += f"\n\nThe failed attempt is costly to your health ({health_change} health)."
+            
+            # Reduce hope for failed crossing
+            if hasattr(character, 'hope'):
+                character.hope = max(0, character.hope - 10)
+                result += " Your failed attempt weighs heavily on your spirit."
+                
+            # Update journey stats
+            game.story.update_journey_stats("key_events", f"Failed border crossing attempt using {chosen_method['name']}")
+        
+        # Add trauma from the experience
+        if hasattr(character, 'trauma'):
+            trauma_increase = 5 if success else 10
+            character.trauma = min(100, character.trauma + trauma_increase)
+            
+        # Apply the turn count
+        game.turn_count += 1
+            
+        return result
 
 class MoralEvent(Event):
     """An event that presents a moral choice to the character."""

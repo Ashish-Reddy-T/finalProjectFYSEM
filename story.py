@@ -12,6 +12,7 @@ import sys
 import random
 from datetime import datetime
 
+from character import Migrant, BorderPatrol
 
 class Story:
     """Manages the narrative elements of the game."""
@@ -358,11 +359,12 @@ class Story:
             time.sleep(delay)
         print()
     
-    def display_intro(self, starting_location):
+    def display_intro(self, starting_location, character_type=None):
         """Display the game introduction with context from Cantú's book.
         
         Args:
             starting_location (str): The name of the player's starting location
+            character_type (str): The type of character ("migrant" or "patrol")
         """
         self.clear_screen()
         
@@ -387,7 +389,32 @@ class Story:
         """
         
         self.print_slow(intro_text)
-        print(f"\nYour journey begins in {starting_location}.")
+        
+        # Character-specific introduction
+        if character_type == "migrant":
+            migrant_intro = f"""
+            You begin your journey in {starting_location}, on the Mexican side of the border.
+            The United States lies to the north, beyond a heavily patrolled border wall.
+            Your goal is to find a way across this barrier and eventually reach Tucson,
+            but the crossing will be dangerous and challenging.
+            
+            You'll need to gather resources, make careful decisions about how to approach
+            the border, and be prepared for the physical and emotional toll of the journey.
+            """
+            self.print_slow(migrant_intro)
+        elif character_type == "patrol":
+            patrol_intro = f"""
+            You are stationed in {starting_location}, on the US side of the border.
+            As a Border Patrol agent, your jurisdiction is limited to American soil.
+            
+            Your duties include patrolling the border area, responding to sensor alerts,
+            apprehending those who cross illegally, and processing them according to protocol.
+            
+            While you enforce the law, you'll face moral dilemmas that test your sense of
+            duty against your humanity, much like Cantú experienced during his service.
+            """
+            self.print_slow(patrol_intro)
+        
         input("\nPress Enter to continue ... ")
         self.clear_screen()
     
